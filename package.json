@@ -1,0 +1,32 @@
+{
+  "name": "@drawdb/mcp",
+  "version": "0.1.0",
+  "description": "MCP server that exposes drawDB diagrams to AI agents (read-only).",
+  "type": "module",
+  "main": "dist/server.js",
+  "bin": {
+    "drawdb-mcp": "dist/stdio.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node --env-file-if-exists=.env dist/stdio.js",
+    "dev": "tsx --env-file-if-exists=.env src/stdio.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
