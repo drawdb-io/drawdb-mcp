@@ -22,7 +22,7 @@ DDL / DBML export are not yet implemented — they need the OSS exporters lifted
 
 ## Backend contract
 
-The MCP server expects two endpoints on the drawDB backend, authed by `Authorization: Bearer <api_key>`:
+The MCP server expects two endpoints on the drawDB backend, authed by the `X-API-Key` header:
 
 ```
 GET /api/v1/diagrams                    -> { diagrams: DiagramSummary[] }
@@ -58,10 +58,11 @@ npm run dev            # runs the stdio server against your local backend
 }
 ```
 
-For local dev against your own backend, point `DRAWDB_BASE_URL` at `http://localhost:4000` and use a JWT from your signed-in browser session as the API key until the proper API-keys feature ships.
+For local dev against your own backend, point `DRAWDB_BASE_URL` at `http://localhost:4000` and mint an API key in the drawDB **Profile modal → API keys** tab. Keys must start with `ddb_` — JWTs are not accepted on `/api/v1`.
 
 ## Auth model
 
-- API keys will be minted from the drawDB Profile modal → API keys tab.
-- A key inherits the user's plan + access. Read-only by design; the MCP server has no mutating tools.
+- API keys are minted from the drawDB Profile modal → API keys tab.
+- A key inherits the user's plan + access, and lists diagrams across *every* team the user belongs to (no workspace scoping — the agent sees them all).
+- Read-only by design; the MCP server has no mutating tools.
 - Revoking a key invalidates every agent that holds it.

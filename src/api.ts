@@ -1,10 +1,11 @@
 // Thin client for the drawDB backend.
 //
-// Contract assumed (server-side endpoints to add):
+// Contract:
 //   GET /api/v1/diagrams                  -> { diagrams: DiagramSummary[] }
 //   GET /api/v1/diagrams/:id/schema       -> DiagramSchema
 //
-// Both authed by `Authorization: Bearer <DRAWDB_API_KEY>`.
+// Authed via the `X-API-Key: <DRAWDB_API_KEY>` header — separate from the
+// JWT `Authorization: Bearer` flow used by the editor.
 
 import type { DiagramSchema, DiagramSummary } from "./types.js";
 
@@ -36,7 +37,7 @@ export class DrawDBClient {
   private async fetchJson<T>(path: string): Promise<T> {
     const res = await fetch(`${this.baseUrl}${path}`, {
       headers: {
-        Authorization: `Bearer ${this.apiKey}`,
+        "X-API-Key": this.apiKey,
         Accept: "application/json",
       },
     });
