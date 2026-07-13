@@ -47,17 +47,27 @@ function tableDescriptor(t: Table) {
 function relationshipDescriptor(schema: DiagramSchema, ref: Reference) {
   const start = schema.tables.find((t) => t.id === ref.startTableId) ?? null;
   const end = schema.tables.find((t) => t.id === ref.endTableId) ?? null;
-  const startField = start?.fields.find((f) => f.id === ref.startFieldId);
-  const endField = end?.fields.find((f) => f.id === ref.endFieldId);
+
+  const pairs =
+    ref.fields && ref.fields.length > 0
+      ? ref.fields
+      : [{ startFieldId: ref.startFieldId, endFieldId: ref.endFieldId }];
+  const fromFields = pairs.map(
+    (p) => start?.fields.find((f) => f.id === p.startFieldId)?.name ?? null,
+  );
+  const toFields = pairs.map(
+    (p) => end?.fields.find((f) => f.id === p.endFieldId)?.name ?? null,
+  );
   return {
     name: ref.name,
     cardinality: ref.cardinality,
     onUpdate: ref.updateConstraint,
     onDelete: ref.deleteConstraint,
+    composite: pairs.length > 1,
     from: start
-      ? { table: start.name, field: startField?.name ?? null }
+      ? { table: start.name, field: fromFields[0], fields: fromFields }
       : null,
-    to: end ? { table: end.name, field: endField?.name ?? null } : null,
+    to: end ? { table: end.name, field: toFields[0], fields: toFields } : null,
   };
 }
 

@@ -57,6 +57,7 @@ export interface Reference {
   startFieldId: number;
   endTableId: number;
   endFieldId: number;
+  fields?: { startFieldId: number; endFieldId: number }[];
   cardinality: Cardinality;
   updateConstraint: ReferentialAction;
   deleteConstraint: ReferentialAction;
