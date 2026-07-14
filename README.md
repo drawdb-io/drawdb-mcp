@@ -35,7 +35,7 @@ GET /api/v1/diagrams/:id/schema         -> DiagramSchema
 
 ```bash
 npm install
-cp .env.example .env   # set DRAWDB_BASE_URL and DRAWDB_API_KEY
+cp .env.example .env   # set DRAWDB_API_KEY
 npm run dev            # runs the stdio server against your local backend
 ```
 
@@ -50,7 +50,6 @@ npm run dev            # runs the stdio server against your local backend
       "command": "npx",
       "args": ["-y", "@drawdb/mcp"],
       "env": {
-        "DRAWDB_BASE_URL": "https://api.drawdb.app",
         "DRAWDB_API_KEY": "ddb_xxx"
       }
     }
@@ -58,7 +57,9 @@ npm run dev            # runs the stdio server against your local backend
 }
 ```
 
-For local dev against your own backend, point `DRAWDB_BASE_URL` at `http://localhost:4000` and mint an API key in the drawDB **Profile modal → API keys** tab. Keys must start with `ddb_` — JWTs are not accepted on `/api/v1`.
+Mint an API key in the drawDB **Profile modal → API keys** tab. Keys must start with `ddb_` — JWTs are not accepted on `/api/v1`.
+
+> For testing against a local backend, set `DRAWDB_BASE_URL` (e.g. `http://localhost:4000`). It otherwise defaults to `https://api.drawdb.app`.
 
 ## Auth model
 
