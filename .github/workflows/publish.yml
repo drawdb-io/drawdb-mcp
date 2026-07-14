@@ -4,10 +4,10 @@ on:
   push:
     branches: [main]
 
-# Least privilege; id-token lets npm attach build provenance.
+# Least privilege. Provenance is disabled because npm provenance requires a
+# public source repository, and this repo is private.
 permissions:
   contents: read
-  id-token: write
 
 concurrency:
   group: publish-npm
@@ -56,6 +56,6 @@ jobs:
 
       - name: Publish
         if: steps.check.outputs.publish == 'true'
-        run: npm publish --provenance --access public
+        run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
