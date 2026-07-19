@@ -1,6 +1,6 @@
 {
   "name": "@drawdb/mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "MCP server that exposes drawDB diagrams to AI agents (read-only).",
   "type": "module",
   "main": "dist/server.js",
