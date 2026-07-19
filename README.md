@@ -2,8 +2,6 @@
 
 MCP server that exposes drawDB diagrams to AI agents (read-only). Stdio transport, for Claude Desktop, Cursor, Cline, Goose, Windsurf, and other clients that launch a local MCP child process.
 
-A hosted HTTP transport (for ChatGPT and claude.ai web) will be added later — those clients require OAuth 2.1, which lives in the backend, not here.
-
 ## Tools
 
 | Tool | Args | Returns |
@@ -17,27 +15,6 @@ A hosted HTTP transport (for ChatGPT and claude.ai web) will be added later — 
 | `list_enums` | `diagram_id` | user-defined enums |
 | `list_custom_types` | `diagram_id` | Postgres composite types |
 | `search_tables` | `diagram_id`, `query` | substring matches across names + comments |
-
-DDL / DBML export are not yet implemented — they need the OSS exporters lifted into this package or a server-side endpoint that runs them.
-
-## Backend contract
-
-The MCP server expects two endpoints on the drawDB backend, authed by the `X-API-Key` header:
-
-```
-GET /api/v1/diagrams                    -> { diagrams: DiagramSummary[] }
-GET /api/v1/diagrams/:id/schema         -> DiagramSchema
-```
-
-`DiagramSchema` is the same JSON drawDB stores in R2 (tables / references / enums / types / database).
-
-## Local development
-
-```bash
-npm install
-cp .env.example .env   # set DRAWDB_API_KEY
-npm run dev            # runs the stdio server against your local backend
-```
 
 ## Wiring into a client
 
@@ -58,8 +35,6 @@ npm run dev            # runs the stdio server against your local backend
 ```
 
 Mint an API key in the drawDB **Profile modal → API keys** tab. Keys must start with `ddb_` — JWTs are not accepted on `/api/v1`.
-
-> For testing against a local backend, set `DRAWDB_BASE_URL` (e.g. `http://localhost:4000`). It otherwise defaults to `https://api.drawdb.app`.
 
 ## Auth model
 
