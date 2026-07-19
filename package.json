@@ -5,6 +5,26 @@
   "type": "module",
   "main": "dist/server.js",
   "license": "MIT",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "modelcontextprotocol",
+    "mcp-server",
+    "drawdb",
+    "database",
+    "database-schema",
+    "erd",
+    "entity-relationship-diagram",
+    "sql",
+    "schema",
+    "ai",
+    "llm",
+    "ai-agent",
+    "claude",
+    "cursor",
+    "database-design",
+    "drawdb"
+  ],
   "bin": {
     "drawdb-mcp": "dist/stdio.js"
   },
