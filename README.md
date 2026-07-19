@@ -67,3 +67,7 @@ Mint an API key in the drawDB **Profile modal → API keys** tab. Keys must star
 - A key inherits the user's plan + access, and lists diagrams across *every* team the user belongs to (no workspace scoping — the agent sees them all).
 - Read-only by design; the MCP server has no mutating tools.
 - Revoking a key invalidates every agent that holds it.
+
+## License
+
+MIT — see [LICENSE](./LICENSE).

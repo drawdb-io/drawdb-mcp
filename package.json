@@ -4,12 +4,14 @@
   "description": "MCP server that exposes drawDB diagrams to AI agents (read-only).",
   "type": "module",
   "main": "dist/server.js",
+  "license": "MIT",
   "bin": {
     "drawdb-mcp": "dist/stdio.js"
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
