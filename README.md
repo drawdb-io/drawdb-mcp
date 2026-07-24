@@ -1,4 +1,4 @@
-# drawdb-mcp
+# @drawdb/mcp
 
 A [Model Context Protocol](https://modelcontextprotocol.io) server that gives AI
 agents **read-only** access to your [drawDB](https://drawdb.app) diagrams — so
