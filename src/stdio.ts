@@ -1,18 +1,18 @@
 #!/usr/bin/env node
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { config } from "./config.js";
 import { createServer } from "./server.js";
 
 async function main() {
-  const baseUrl = process.env.DRAWDB_BASE_URL || "https://api.drawdb.app";
   const apiKey = process.env.DRAWDB_API_KEY;
   if (!apiKey) {
     console.error(
-      "drawdb-mcp: set DRAWDB_API_KEY env var before launching (DRAWDB_BASE_URL is optional, defaults to https://api.drawdb.app).",
+      `drawdb-mcp: set DRAWDB_API_KEY env var before launching (DRAWDB_BASE_URL is optional, defaults to ${config.defaultBaseUrl}).`,
     );
     process.exit(1);
   }
 
-  const server = createServer({ baseUrl, apiKey });
+  const server = createServer({ baseUrl: process.env.DRAWDB_BASE_URL, apiKey });
   const transport = new StdioServerTransport();
   await server.connect(transport);
 }

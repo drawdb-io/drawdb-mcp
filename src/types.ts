@@ -1,11 +1,3 @@
-// Diagram JSON shape as stored by drawDB. Mirrors the OSS editor state
-// (TablesContext + RelationshipsContext + EnumsContext + TypesContext +
-// DiagramContext.database). Kept loose where drawDB itself is loose.
-
-// Loose: drawDB OSS uses values like "mysql", "postgresql", "transactsql",
-// "sqlite", "mariadb", "oraclesql", "generic" inside the diagram JSON. The
-// API summary endpoint may emit the backend's slightly different aliases
-// (e.g. "mssql" instead of "transactsql"). Keep the type permissive.
 export type Database = string;
 
 export type Cardinality = "one_to_one" | "one_to_many" | "many_to_one";

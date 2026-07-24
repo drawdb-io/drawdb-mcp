@@ -1,10 +1,19 @@
 {
   "name": "@drawdb/mcp",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "MCP server that exposes drawDB diagrams to AI agents (read-only).",
   "type": "module",
   "main": "dist/server.js",
   "license": "MIT",
+  "author": "1ilit",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/drawdb-io/drawdb-mcp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/drawdb-io/drawdb-mcp/issues"
+  },
+  "homepage": "https://github.com/drawdb-io/drawdb-mcp#readme",
   "keywords": [
     "mcp",
     "model-context-protocol",

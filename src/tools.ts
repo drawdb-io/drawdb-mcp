@@ -52,12 +52,14 @@ function relationshipDescriptor(schema: DiagramSchema, ref: Reference) {
     ref.fields && ref.fields.length > 0
       ? ref.fields
       : [{ startFieldId: ref.startFieldId, endFieldId: ref.endFieldId }];
+
   const fromFields = pairs.map(
     (p) => start?.fields.find((f) => f.id === p.startFieldId)?.name ?? null,
   );
   const toFields = pairs.map(
     (p) => end?.fields.find((f) => f.id === p.endFieldId)?.name ?? null,
   );
+
   return {
     name: ref.name,
     cardinality: ref.cardinality,
@@ -114,6 +116,7 @@ export function registerTools(server: McpServer, client: DrawDBClient): void {
     },
     async ({ diagram_id }) => {
       const schema = await client.getSchema(diagram_id);
+
       return asJson({
         database: schema.database,
         tableCount: schema.tables.length,
@@ -133,6 +136,7 @@ export function registerTools(server: McpServer, client: DrawDBClient): void {
     },
     async ({ diagram_id }) => {
       const schema = await client.getSchema(diagram_id);
+
       return asJson(
         schema.tables.map((t) => ({
           name: t.name,
@@ -155,7 +159,9 @@ export function registerTools(server: McpServer, client: DrawDBClient): void {
     async ({ diagram_id, table_name }) => {
       const schema = await client.getSchema(diagram_id);
       const table = findTable(schema, table_name);
+
       if (!table) return asError(`Table not found: ${table_name}`);
+
       return asJson(tableDescriptor(table));
     },
   );
@@ -169,6 +175,7 @@ export function registerTools(server: McpServer, client: DrawDBClient): void {
     },
     async ({ diagram_id }) => {
       const schema = await client.getSchema(diagram_id);
+
       return asJson(
         schema.references.map((r) => relationshipDescriptor(schema, r)),
       );
@@ -190,16 +197,20 @@ export function registerTools(server: McpServer, client: DrawDBClient): void {
       const schema = await client.getSchema(diagram_id);
       const from = findTable(schema, from_table);
       const to = findTable(schema, to_table);
+
       if (!from) return asError(`Table not found: ${from_table}`);
       if (!to) return asError(`Table not found: ${to_table}`);
+
       const matches = schema.references
         .filter((r) => r.startTableId === from.id && r.endTableId === to.id)
         .map((r) => relationshipDescriptor(schema, r));
+
       if (matches.length === 0) {
         return asError(
           `No relationships from ${from.name} to ${to.name}.`,
         );
       }
+
       return asJson(matches);
     },
   );
@@ -212,6 +223,7 @@ export function registerTools(server: McpServer, client: DrawDBClient): void {
     },
     async ({ diagram_id }) => {
       const schema = await client.getSchema(diagram_id);
+
       return asJson(
         (schema.enums ?? []).map((e) => ({
           name: e.name,
@@ -229,6 +241,7 @@ export function registerTools(server: McpServer, client: DrawDBClient): void {
     },
     async ({ diagram_id }) => {
       const schema = await client.getSchema(diagram_id);
+
       return asJson(
         (schema.types ?? []).map((t) => ({
           name: t.name,
@@ -252,8 +265,10 @@ export function registerTools(server: McpServer, client: DrawDBClient): void {
     async ({ diagram_id, query }) => {
       const schema = await client.getSchema(diagram_id);
       const q = query.toLowerCase();
+
       type Hit = { table: string; reason: string };
       const hits: Hit[] = [];
+
       for (const t of schema.tables) {
         if (t.name.toLowerCase().includes(q)) {
           hits.push({ table: t.name, reason: "table-name" });
@@ -261,6 +276,7 @@ export function registerTools(server: McpServer, client: DrawDBClient): void {
         if (t.comment?.toLowerCase().includes(q)) {
           hits.push({ table: t.name, reason: "table-comment" });
         }
+
         for (const f of t.fields) {
           if (f.name.toLowerCase().includes(q)) {
             hits.push({
@@ -275,6 +291,7 @@ export function registerTools(server: McpServer, client: DrawDBClient): void {
           }
         }
       }
+
       return asJson({ matches: hits });
     },
   );

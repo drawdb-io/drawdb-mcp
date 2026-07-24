@@ -2,12 +2,12 @@ name: Publish to npm
 
 on:
   push:
-    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
 
-# Least privilege. Provenance is disabled because npm provenance requires a
-# public source repository, and this repo is private.
 permissions:
   contents: read
+  id-token: write
 
 concurrency:
   group: publish-npm
@@ -56,6 +56,6 @@ jobs:
 
       - name: Publish
         if: steps.check.outputs.publish == 'true'
-        run: npm publish --access public
+        run: npm publish --access public --provenance
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

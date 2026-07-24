@@ -7,20 +7,12 @@
 // Authed via the `X-API-Key: <DRAWDB_API_KEY>` header — separate from the
 // JWT `Authorization: Bearer` flow used by the editor.
 
+import { config } from "./config.js";
 import type { DiagramSchema, DiagramSummary } from "./types.js";
 
 export interface ApiClientOptions {
-  baseUrl: string;
+  baseUrl?: string;
   apiKey: string;
-}
-
-export class DrawDBApiError extends Error {
-  status: number;
-  constructor(status: number, message: string) {
-    super(message);
-    this.name = "DrawDBApiError";
-    this.status = status;
-  }
 }
 
 export class DrawDBClient {
@@ -28,9 +20,9 @@ export class DrawDBClient {
   private apiKey: string;
 
   constructor({ baseUrl, apiKey }: ApiClientOptions) {
-    if (!baseUrl) throw new Error("DRAWDB_BASE_URL is required");
     if (!apiKey) throw new Error("DRAWDB_API_KEY is required");
-    this.baseUrl = baseUrl.replace(/\/$/, "");
+
+    this.baseUrl = (baseUrl || config.defaultBaseUrl).replace(/\/$/, "");
     this.apiKey = apiKey;
   }
 
@@ -41,13 +33,14 @@ export class DrawDBClient {
         Accept: "application/json",
       },
     });
+
     if (!res.ok) {
       const text = await res.text().catch(() => "");
-      throw new DrawDBApiError(
-        res.status,
+      throw new Error(
         `drawDB API ${path} failed: ${res.status} ${text || res.statusText}`,
       );
     }
+
     return (await res.json()) as T;
   }
 

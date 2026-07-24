@@ -1,9 +1,14 @@
+import { createRequire } from "node:module";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { DrawDBClient } from "./api.js";
 import { registerTools } from "./tools.js";
 
+const { version } = createRequire(import.meta.url)("../package.json") as {
+  version: string;
+};
+
 export interface CreateServerOptions {
-  baseUrl: string;
+  baseUrl?: string;
   apiKey: string;
 }
 
@@ -13,7 +18,7 @@ export function createServer({ baseUrl, apiKey }: CreateServerOptions): McpServe
   const server = new McpServer(
     {
       name: "drawdb-mcp",
-      version: "0.1.0",
+      version,
     },
     {
       instructions:
