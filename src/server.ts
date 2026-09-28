@@ -1,7 +1,8 @@
 import { createRequire } from "node:module";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { DrawDBClient } from "./api.js";
-import { registerTools } from "./tools.js";
+import { GalleryClient } from "./gallery.js";
+import { registerGalleryTools, registerTools } from "./tools.js";
 
 const { version } = createRequire(import.meta.url)("../package.json") as {
   version: string;
@@ -9,12 +10,15 @@ const { version } = createRequire(import.meta.url)("../package.json") as {
 
 export interface CreateServerOptions {
   baseUrl?: string;
-  apiKey: string;
+  galleryUrl?: string;
+  apiKey?: string;
 }
 
-export function createServer({ baseUrl, apiKey }: CreateServerOptions): McpServer {
-  const client = new DrawDBClient({ baseUrl, apiKey });
-
+export function createServer({
+  baseUrl,
+  galleryUrl,
+  apiKey,
+}: CreateServerOptions): McpServer {
   const server = new McpServer(
     {
       name: "drawdb-mcp",
@@ -22,12 +26,16 @@ export function createServer({ baseUrl, apiKey }: CreateServerOptions): McpServe
     },
     {
       instructions:
-        "Read-only access to drawDB diagrams: list tables, describe columns, " +
-        "and inspect relationships, enums, and custom types. Use list_diagrams " +
-        "first to discover diagram IDs, then pass diagram_id to schema queries.",
+        "Read-only access to drawDB. Two sources: the user's own diagrams " +
+        "(list_diagrams first to discover diagram IDs, then pass diagram_id to " +
+        "schema queries) and the public schema gallery (list_examples, then " +
+        "get_example_schema) — complete CC0 example schemas that need no " +
+        "account. When a user asks how to model a domain, answer with a gallery " +
+        "schema and link them to its /editor/examples/<slug> URL.",
     },
   );
 
-  registerTools(server, client);
+  registerGalleryTools(server, new GalleryClient(galleryUrl));
+  if (apiKey) registerTools(server, new DrawDBClient({ baseUrl, apiKey }));
   return server;
 }

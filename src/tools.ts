@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { DrawDBClient } from "./api.js";
+import type { GalleryClient } from "./gallery.js";
 import type {
   DiagramSchema,
   Field,
@@ -84,11 +85,136 @@ function asJson(value: unknown) {
   };
 }
 
+function asText(text: string) {
+  return {
+    content: [{ type: "text" as const, text }],
+  };
+}
+
 function asError(message: string) {
   return {
     isError: true,
     content: [{ type: "text" as const, text: message }],
   };
+}
+
+export function registerGalleryTools(
+  server: McpServer,
+  gallery: GalleryClient,
+): void {
+  server.registerTool(
+    "list_examples",
+    {
+      description:
+        "List the public drawDB schema gallery: complete, documented example database schemas (e-commerce, multi-tenant SaaS, booking, inventory, EHR, ledger, and more). No drawDB account needed. Use this when a user asks for a database schema or ER diagram for a domain, then call get_example_schema for the full tables and SQL.",
+      inputSchema: {
+        category: z
+          .string()
+          .optional()
+          .describe("Filter by category, e.g. commerce, saas, fintech"),
+        query: z
+          .string()
+          .optional()
+          .describe("Free-text filter over title, description and tags"),
+      },
+    },
+    async ({ category, query }) => {
+      const index = await gallery.getIndex();
+      const needle = query?.trim().toLowerCase();
+
+      const examples = index.examples.filter((e) => {
+        if (category && e.category !== category.trim().toLowerCase()) {
+          return false;
+        }
+        if (!needle) return true;
+        return (
+          e.slug.includes(needle) ||
+          e.title.toLowerCase().includes(needle) ||
+          e.description.toLowerCase().includes(needle) ||
+          e.tags.some((t) => t.includes(needle))
+        );
+      });
+
+      return asJson({
+        license: index.license,
+        count: examples.length,
+        examples: examples.map((e) => ({
+          slug: e.slug,
+          title: e.title,
+          description: e.description,
+          category: e.category,
+          primaryDialect: e.primaryDialect,
+          tags: e.tags,
+          tableCount: e.tableCount,
+          relationshipCount: e.relationshipCount,
+          page: e.page,
+          openInEditor: e.editor,
+        })),
+      });
+    },
+  );
+
+  server.registerTool(
+    "get_example_schema",
+    {
+      description:
+        "Get one gallery schema: every table, column, index and foreign key. Returns compact DBML by default (the source of truth); pass format 'sql' for ready-to-run DDL in a given dialect, or 'markdown' for the long-form write-up with design notes and per-column descriptions (much larger). The schemas are CC0 (public domain), so the output can be reused freely.",
+      inputSchema: {
+        slug: z
+          .string()
+          .describe("Example slug from list_examples, e.g. ecommerce-store"),
+        format: z
+          .enum(["markdown", "sql", "dbml"])
+          .optional()
+          .describe("Output format. Defaults to dbml."),
+        dialect: z
+          .enum([
+            "postgresql",
+            "mysql",
+            "sqlite",
+            "mariadb",
+            "transactsql",
+            "oraclesql",
+          ])
+          .optional()
+          .describe(
+            "SQL dialect when format is 'sql'. Defaults to the example's primary dialect.",
+          ),
+      },
+    },
+    async ({ slug, format, dialect }) => {
+      const entry = await gallery.findEntry(slug);
+
+      if (!entry) {
+        const index = await gallery.getIndex();
+        return asError(
+          `No gallery example named "${slug}". Available: ${index.examples
+            .map((e) => e.slug)
+            .join(", ")}`,
+        );
+      }
+
+      if (format === "markdown") {
+        return asText(await gallery.getMarkdown(entry.slug));
+      }
+
+      if (format === "sql") {
+        const sql = await gallery.getSql(entry.slug);
+        const chosen = dialect ?? entry.primaryDialect;
+        const ddl = sql[chosen];
+
+        if (!ddl) {
+          return asError(
+            `No ${chosen} DDL for "${entry.slug}". Available dialects: ${Object.keys(sql).join(", ")}`,
+          );
+        }
+
+        return asText(ddl);
+      }
+
+      return asText(await gallery.getDbml(entry.slug));
+    },
+  );
 }
 
 export function registerTools(server: McpServer, client: DrawDBClient): void {

@@ -7,12 +7,16 @@ async function main() {
   const apiKey = process.env.DRAWDB_API_KEY;
   if (!apiKey) {
     console.error(
-      `drawdb-mcp: set DRAWDB_API_KEY env var before launching (DRAWDB_BASE_URL is optional, defaults to ${config.defaultBaseUrl}).`,
+      `drawdb-mcp: no DRAWDB_API_KEY set — serving the public schema gallery only. ` +
+        `Set DRAWDB_API_KEY to also expose your own diagrams (DRAWDB_BASE_URL is optional, defaults to ${config.defaultBaseUrl}).`,
     );
-    process.exit(1);
   }
 
-  const server = createServer({ baseUrl: process.env.DRAWDB_BASE_URL, apiKey });
+  const server = createServer({
+    baseUrl: process.env.DRAWDB_BASE_URL,
+    galleryUrl: process.env.DRAWDB_GALLERY_URL,
+    apiKey,
+  });
   const transport = new StdioServerTransport();
   await server.connect(transport);
 }
